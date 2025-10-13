@@ -31,7 +31,7 @@ const HeroSection = () => {
   return (
     <>
       {/* Hero Banner with Background Image */}
-      <section id="hero" className="relative h-[600px] pt-20">
+      <section id="hero" className="relative h-[700px] pt-20">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0">
           <img 
@@ -43,7 +43,7 @@ const HeroSection = () => {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 sm:px-6 lg:px-8 pb-32">
           <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold mb-8 text-center leading-tight">
             <span className="text-red-600">ASOSIASI DOSEN</span>
             <br />
@@ -61,7 +61,7 @@ const HeroSection = () => {
       </section>
 
       {/* Info Cards Section */}
-      <section className="relative -mt-32 z-20 px-4 sm:px-6 lg:px-8 pb-20">
+      <section className="relative -mt-48 z-20 px-4 sm:px-6 lg:px-8 pb-20">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {infoCards.map((card) => (
