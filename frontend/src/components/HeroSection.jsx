@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Users, UserCheck, Calendar } from 'lucide-react';
 import { Button } from './ui/button';
+import RegistrationModal from './RegistrationModal';
 
 const HeroSection = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const handleJoinClick = () => {
-    alert('Fitur pendaftaran akan segera tersedia!');
+    setIsModalOpen(true);
   };
 
   const infoCards = [
@@ -90,6 +93,9 @@ const HeroSection = () => {
           </div>
         </div>
       </section>
+
+      {/* Registration Modal */}
+      <RegistrationModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </>
   );
 };
