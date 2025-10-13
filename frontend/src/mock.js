@@ -95,5 +95,58 @@ export const navItems = [
   { label: "BERANDA", href: "#hero" },
   { label: "TENTANG KAMI", href: "#about" },
   { label: "KEGIATAN", href: "#kegiatan" },
-  { label: "MITRA ADIPSI", href: "#mitra" }
+  { label: "MITRA ADIPSI", href: "#mitra" },
+  { label: "GALERI", href: "#gallery" },
+  { label: "KONTAK", href: "#contact" }
+];
+
+export const galleryPhotos = [
+  {
+    id: 1,
+    url: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=600&fit=crop",
+    title: "Rapat Koordinasi Nasional",
+    category: "Rapat"
+  },
+  {
+    id: 2,
+    url: "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&h=600&fit=crop",
+    title: "Seminar Nasional",
+    category: "Seminar"
+  },
+  {
+    id: 3,
+    url: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&h=600&fit=crop",
+    title: "Workshop Dosen",
+    category: "Workshop"
+  },
+  {
+    id: 4,
+    url: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop",
+    title: "Kegiatan Lapangan",
+    category: "Kegiatan"
+  },
+  {
+    id: 5,
+    url: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&h=600&fit=crop",
+    title: "Kunjungan Kerja",
+    category: "Kunjungan"
+  },
+  {
+    id: 6,
+    url: "https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=800&h=600&fit=crop",
+    title: "Penandatanganan MoU",
+    category: "Kerjasama"
+  },
+  {
+    id: 7,
+    url: "https://images.unsplash.com/photo-1591115765373-5207764f72e7?w=800&h=600&fit=crop",
+    title: "Diskusi Panel",
+    category: "Diskusi"
+  },
+  {
+    id: 8,
+    url: "https://images.unsplash.com/photo-1559223607-9a43f01e779d?w=800&h=600&fit=crop",
+    title: "Konferensi Internasional",
+    category: "Konferensi"
+  }
 ];
