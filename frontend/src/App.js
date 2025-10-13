@@ -9,6 +9,7 @@ import GallerySection from './components/GallerySection';
 import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
 import AboutPage from './components/AboutPage';
+import KegiatanPage from './components/KegiatanPage';
 import { Toaster } from './components/ui/toaster';
 
 const HomePage = () => {
@@ -36,6 +37,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/tentang-kami" element={<AboutPage />} />
+          <Route path="/kegiatan" element={<KegiatanPage />} />
         </Routes>
         <Footer />
         <Toaster />
