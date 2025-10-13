@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Users, UserCheck, Calendar } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import RegistrationModal from './RegistrationModal';
 
 const HeroSection = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleJoinClick = () => {
     setIsModalOpen(true);
@@ -15,19 +17,28 @@ const HeroSection = () => {
       id: 1,
       title: 'TENTANG KAMI',
       image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&h=800&fit=crop',
-      icon: Users
+      icon: Users,
+      onClick: () => navigate('/tentang-kami')
     },
     {
       id: 2,
       title: 'ANGGOTA KAMI',
       image: 'https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=600&h=800&fit=crop',
-      icon: UserCheck
+      icon: UserCheck,
+      onClick: () => {
+        const element = document.querySelector('#mitra');
+        if (element) element.scrollIntoView({ behavior: 'smooth' });
+      }
     },
     {
       id: 3,
       title: 'KEGIATAN KAMI',
       image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=800&fit=crop',
-      icon: Calendar
+      icon: Calendar,
+      onClick: () => {
+        const element = document.querySelector('#kegiatan');
+        if (element) element.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   ];
 
@@ -70,6 +81,7 @@ const HeroSection = () => {
             {infoCards.map((card) => (
               <div 
                 key={card.id}
+                onClick={card.onClick}
                 className="relative group overflow-hidden rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:scale-105 cursor-pointer h-96"
               >
                 {/* Card Background Image */}
