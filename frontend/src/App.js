@@ -4,6 +4,8 @@ import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import KegiatanSection from './components/KegiatanSection';
 import MitraSection from './components/MitraSection';
+import GallerySection from './components/GallerySection';
+import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
 import { Toaster } from './components/ui/toaster';
 
@@ -19,6 +21,8 @@ function App() {
       <HeroSection />
       <KegiatanSection />
       <MitraSection />
+      <GallerySection />
+      <ContactSection />
       <Footer />
       <Toaster />
     </div>
