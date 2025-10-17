@@ -8,9 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: frontend
+        working-directory: frontend  # <- pastikan folder ini benar
     steps:
-      - name: Checkout
+      - name: Checkout (Barang-Baru)
         uses: actions/checkout@v4
         with:
           ref: Barang-Baru
@@ -19,18 +19,37 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'yarn'
-          cache-dependency-path: frontend/yarn.lock
+          # ❌ JANGAN pakai cache path yg bikin error kalau yarn.lock gak ada
 
-      - name: Install deps
-        run: yarn install --frozen-lockfile || yarn install
-
-      - name: Ensure CRA compatible versions
+      - name: Detect package manager
+        id: pm
         run: |
+          if [ -f yarn.lock ]; then
+            echo "manager=yarn" >> $GITHUB_OUTPUT
+          else
+            echo "manager=npm" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install deps (Yarn)
+        if: steps.pm.outputs.manager == 'yarn'
+        run: |
+          yarn install --frozen-lockfile || yarn install
+          # CRA 5 butuh React 18
           yarn add react@18.3.1 react-dom@18.3.1 react-scripts@5.0.1 --exact
 
-      - name: Build
+      - name: Install deps (NPM)
+        if: steps.pm.outputs.manager == 'npm'
+        run: |
+          npm install
+          npm install react@18.3.1 react-dom@18.3.1 react-scripts@5.0.1 --save-exact
+
+      - name: Build (Yarn)
+        if: steps.pm.outputs.manager == 'yarn'
         run: yarn build
+
+      - name: Build (NPM)
+        if: steps.pm.outputs.manager == 'npm'
+        run: npm run build
 
       - name: Zip build as site.zip
         run: |
