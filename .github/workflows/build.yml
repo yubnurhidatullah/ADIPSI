@@ -12,26 +12,24 @@ jobs:
         with:
           ref: Barang-Baru
 
-      - name: Use Node LTS
+      - name: Use Node 18 (LTS stabil untuk CRA 5)
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '18'
 
-      - name: Detect project directory (package.json with scripts)
+      - name: Detect project directory
         id: detect
         run: |
           set -e
           CANDIDATES=$(grep -Rl '"scripts"' --include=package.json || true)
           DIR=$(echo "${CANDIDATES}" | grep -E '^frontend/package.json$' | sed 's#/package.json##')
-          if [ -z "$DIR" ]; then
-            DIR=$(echo "${CANDIDATES}" | head -n1 | sed 's#/package.json##')
-          fi
+          if [ -z "$DIR" ]; then DIR=$(echo "${CANDIDATES}" | head -n1 | sed 's#/package.json##'); fi
           [ -f "$DIR/package.json" ] || (echo "package.json not found" && exit 1)
           echo "PROJECT_DIR=$DIR" >> $GITHUB_OUTPUT
           echo "📁 Project: $DIR"
           cat "$DIR/package.json"
 
-      - name: Install deps (Yarn if yarn.lock exists)
+      - name: Install deps (prefer yarn if lock exists)
         id: pm
         run: |
           set -e
@@ -39,14 +37,27 @@ jobs:
           if [ -f yarn.lock ]; then
             echo "manager=yarn" >> $GITHUB_OUTPUT
             yarn install --frozen-lockfile || yarn install
-            # Pin versi kompatibel
-            yarn add react@18.3.1 react-dom@18.3.1 react-scripts@5.0.1 date-fns@3.6.0 --exact
+            # Pin versi kompatibel (AJV v8, CRA 5, React 18)
+            yarn add react@18.3.1 react-dom@18.3.1 react-scripts@5.0.1 date-fns@3.6.0 ajv@8.17.1 ajv-keywords@5.1.0 --exact
           else
             echo "manager=npm" >> $GITHUB_OUTPUT
-            # Jangan pakai npm ci (tidak ada package-lock)
             npm install --legacy-peer-deps
-            npm install react@18.3.1 react-dom@18.3.1 react-scripts@5.0.1 date-fns@3.6.0 --save-exact --legacy-peer-deps
+            npm install react@18.3.1 react-dom@18.3.1 react-scripts@5.0.1 date-fns@3.6.0 ajv@8.17.1 ajv-keywords@5.1.0 --save-exact --legacy-peer-deps
           fi
+
+      - name: Ensure Tailwind/PostCSS configs (if missing)
+        run: |
+          set -e
+          cd "${{ steps.detect.outputs.PROJECT_DIR }}"
+          [ -f postcss.config.js ] || echo "module.exports={plugins:{tailwindcss:{},autoprefixer:{}}};" > postcss.config.js
+          [ -f tailwind.config.js ] || cat > tailwind.config.js <<'CFG'
+          /** @type {import('tailwindcss').Config} */
+          module.exports = {
+            content: ['./public/index.html', './src/**/*.{js,jsx,ts,tsx}'],
+            theme: { extend: {} },
+            plugins: [require('tailwindcss-animate')],
+          };
+          CFG
 
       - name: Build
         run: |
@@ -57,6 +68,7 @@ jobs:
           else
             npm run build --legacy-peer-deps
           fi
+          test -d build
 
       - name: Zip build as site.zip
         run: |
