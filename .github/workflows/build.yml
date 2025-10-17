@@ -21,76 +21,49 @@ jobs:
         id: detect
         run: |
           set -e
-          # Cari package.json yang punya "scripts"
           CANDIDATES=$(grep -Rl '"scripts"' --include=package.json || true)
-          echo "Candidates:"
-          echo "${CANDIDATES}"
-          # Pilih yang paling mirip frontend/client/app jika ada
-          DIR=""
-          for d in frontend client app web; do
-            if echo "${CANDIDATES}" | grep -E "^${d}/package.json$"; then DIR="${d}"; break; fi
-          done
-          # Kalau belum ketemu, ambil yang pertama
+          DIR=$(echo "${CANDIDATES}" | grep -E '^frontend/package.json$' | sed 's#/package.json##')
           if [ -z "$DIR" ]; then
             DIR=$(echo "${CANDIDATES}" | head -n1 | sed 's#/package.json##')
           fi
-          if [ -z "$DIR" ] || [ ! -f "$DIR/package.json" ]; then
-            echo "Tidak menemukan package.json." >&2
-            exit 1
-          fi
+          [ -f "$DIR/package.json" ] || (echo "package.json not found" && exit 1)
           echo "PROJECT_DIR=$DIR" >> $GITHUB_OUTPUT
-          echo "📁 Project dir: $DIR"
-          echo "----- package.json -----"
+          echo "📁 Project: $DIR"
           cat "$DIR/package.json"
 
-      - name: Install deps (yarn or npm) + pin CRA compatible versions
+      - name: Install deps (Yarn if yarn.lock exists)
+        id: pm
         run: |
           set -e
           cd "${{ steps.detect.outputs.PROJECT_DIR }}"
           if [ -f yarn.lock ]; then
-            corepack enable || true
-            yarn --version || npm i -g yarn
+            echo "manager=yarn" >> $GITHUB_OUTPUT
             yarn install --frozen-lockfile || yarn install
-            yarn add react@18.3.1 react-dom@18.3.1 react-scripts@5.0.1 --exact
+            # Pin versi kompatibel
+            yarn add react@18.3.1 react-dom@18.3.1 react-scripts@5.0.1 date-fns@3.6.0 --exact
           else
-            npm ci || npm install
-            npm install react@18.3.1 react-dom@18.3.1 react-scripts@5.0.1 --save-exact
+            echo "manager=npm" >> $GITHUB_OUTPUT
+            # Jangan pakai npm ci (tidak ada package-lock)
+            npm install --legacy-peer-deps
+            npm install react@18.3.1 react-dom@18.3.1 react-scripts@5.0.1 date-fns@3.6.0 --save-exact --legacy-peer-deps
           fi
-
-      - name: Ensure Tailwind/PostCSS configs (if missing)
-        run: |
-          set -e
-          cd "${{ steps.detect.outputs.PROJECT_DIR }}"
-          [ -f postcss.config.js ] || cat > postcss.config.js <<'CFG'
-          module.exports = { plugins: { tailwindcss: {}, autoprefixer: {} } };
-          CFG
-          [ -f tailwind.config.js ] || cat > tailwind.config.js <<'CFG'
-          /** @type {import('tailwindcss').Config} */
-          module.exports = {
-            content: ['./public/index.html', './src/**/*.{js,jsx,ts,tsx}'],
-            theme: { extend: {} },
-            plugins: [require('tailwindcss-animate')],
-          };
-          CFG
 
       - name: Build
         run: |
           set -e
           cd "${{ steps.detect.outputs.PROJECT_DIR }}"
-          if [ -f yarn.lock ]; then
+          if [ "${{ steps.pm.outputs.manager }}" = "yarn" ]; then
             yarn build
           else
-            npm run build
+            npm run build --legacy-peer-deps
           fi
-          test -d build
 
       - name: Zip build as site.zip
         run: |
-          set -e
           cd "${{ steps.detect.outputs.PROJECT_DIR }}/build"
           zip -r ../site.zip ./*
 
-      - name: Upload artifact (site.zip)
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: site
