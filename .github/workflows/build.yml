@@ -69,6 +69,11 @@ jobs:
             npm run build --legacy-peer-deps
           fi
           test -d build
+      - name: Show package.json
+  run: |
+    cd "${{ steps.detect.outputs.PROJECT_DIR }}"
+    sed -n '1,200p' package.json
+
 
       - name: Zip build as site.zip
         run: |
