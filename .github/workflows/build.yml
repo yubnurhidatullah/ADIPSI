@@ -27,7 +27,11 @@ jobs:
           [ -f "$DIR/package.json" ] || (echo "package.json not found" && exit 1)
           echo "PROJECT_DIR=$DIR" >> $GITHUB_OUTPUT
           echo "📁 Project: $DIR"
-          cat "$DIR/package.json"
+
+      - name: Show package.json (verifikasi JSON valid)
+        run: |
+          cd "${{ steps.detect.outputs.PROJECT_DIR }}"
+          sed -n '1,200p' package.json
 
       - name: Install deps (prefer yarn if lock exists)
         id: pm
@@ -41,6 +45,7 @@ jobs:
             yarn add react@18.3.1 react-dom@18.3.1 react-scripts@5.0.1 date-fns@3.6.0 ajv@8.17.1 ajv-keywords@5.1.0 --exact
           else
             echo "manager=npm" >> $GITHUB_OUTPUT
+            # Jangan pakai npm ci karena tidak ada package-lock
             npm install --legacy-peer-deps
             npm install react@18.3.1 react-dom@18.3.1 react-scripts@5.0.1 date-fns@3.6.0 ajv@8.17.1 ajv-keywords@5.1.0 --save-exact --legacy-peer-deps
           fi
@@ -69,11 +74,6 @@ jobs:
             npm run build --legacy-peer-deps
           fi
           test -d build
-      - name: Show package.json
-  run: |
-    cd "${{ steps.detect.outputs.PROJECT_DIR }}"
-    sed -n '1,200p' package.json
-
 
       - name: Zip build as site.zip
         run: |
