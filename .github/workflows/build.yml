@@ -28,7 +28,7 @@ jobs:
           echo "PROJECT_DIR=$DIR" >> $GITHUB_OUTPUT
           echo "📁 Project: $DIR"
 
-      - name: Show package.json (verifikasi JSON valid)
+      - name: Show package.json (debug)
         run: |
           cd "${{ steps.detect.outputs.PROJECT_DIR }}"
           sed -n '1,200p' package.json
@@ -41,11 +41,10 @@ jobs:
           if [ -f yarn.lock ]; then
             echo "manager=yarn" >> $GITHUB_OUTPUT
             yarn install --frozen-lockfile || yarn install
-            # Pin versi kompatibel (AJV v8, CRA 5, React 18)
+            # Pin versi kompatibel (AJV v8, CRA 5, React 18, date-fns 3)
             yarn add react@18.3.1 react-dom@18.3.1 react-scripts@5.0.1 date-fns@3.6.0 ajv@8.17.1 ajv-keywords@5.1.0 --exact
           else
             echo "manager=npm" >> $GITHUB_OUTPUT
-            # Jangan pakai npm ci karena tidak ada package-lock
             npm install --legacy-peer-deps
             npm install react@18.3.1 react-dom@18.3.1 react-scripts@5.0.1 date-fns@3.6.0 ajv@8.17.1 ajv-keywords@5.1.0 --save-exact --legacy-peer-deps
           fi
