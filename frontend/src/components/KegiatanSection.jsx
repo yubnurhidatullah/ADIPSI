@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
-import { activities } from '../mock';
-import { Card, CardContent } from './ui/card';
+import React, { useEffect, useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import NewsCard from './NewsCard';
+import { fetchActivities } from '@/lib/wordpress';
 
 const KegiatanSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const itemsPerPage = 3;
-  const maxIndex = Math.max(0, activities.length - itemsPerPage);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const maxIndex = Math.max(0, Math.max(0, posts.length - itemsPerPage));
 
   const handlePrev = () => {
     setCurrentIndex((prev) => Math.max(0, prev - 1));
@@ -16,7 +19,27 @@ const KegiatanSection = () => {
     setCurrentIndex((prev) => Math.min(maxIndex, prev + 1));
   };
 
-  const visibleActivities = activities.slice(currentIndex, currentIndex + itemsPerPage);
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        setLoading(true);
+        const data = await fetchActivities({ perPage: 9 });
+        if (!isMounted) return;
+        setPosts(data);
+      } catch (e) {
+        if (!isMounted) return;
+        setError('Gagal memuat kegiatan.');
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const visibleActivities = posts.slice(currentIndex, currentIndex + itemsPerPage);
 
   return (
     <section id="kegiatan" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
@@ -43,36 +66,17 @@ const KegiatanSection = () => {
           </div>
         </div>
 
+        {error && (
+          <div className="text-red-600 mb-4">{error}</div>
+        )}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {visibleActivities.map((activity) => (
-            <Card 
-              key={activity.id} 
-              className="group overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:scale-105 cursor-pointer"
-            >
-              <div className="relative overflow-hidden">
-                <img 
-                  src={activity.image} 
-                  alt={activity.title} 
-                  className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
-                  Terbaru
-                </div>
-              </div>
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-2 text-gray-500 text-sm mb-3">
-                  <Calendar size={16} />
-                  <span>{activity.date}</span>
-                </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-blue-600 transition-colors">
-                  {activity.title}
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  {activity.description}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+          {loading
+            ? Array.from({ length: itemsPerPage }).map((_, idx) => (
+                <div key={idx} className="animate-pulse h-80 bg-gray-200 rounded-xl" />
+              ))
+            : visibleActivities.map((post) => (
+                <NewsCard key={post.id} post={post} />
+              ))}
         </div>
       </div>
     </section>
