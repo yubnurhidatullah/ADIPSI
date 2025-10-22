@@ -6,6 +6,8 @@ import KegiatanSection from './components/KegiatanSection';
 import MitraSection from './components/MitraSection';
 import Footer from './components/Footer';
 import { Toaster } from './components/ui/toaster';
+import { Routes, Route } from 'react-router-dom';
+import PostDetail from './pages/PostDetail';
 
 function App() {
   useEffect(() => {
@@ -16,9 +18,19 @@ function App() {
   return (
     <div className="App">
       <Navbar />
-      <HeroSection />
-      <KegiatanSection />
-      <MitraSection />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <>
+              <HeroSection />
+              <KegiatanSection />
+              <MitraSection />
+            </>
+          }
+        />
+        <Route path="/kegiatan/:slug" element={<PostDetail />} />
+      </Routes>
       <Footer />
       <Toaster />
     </div>
